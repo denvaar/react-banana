@@ -9,15 +9,9 @@ import {
 } from '../actions/actions';
 
 const INITIAL_STATE = {
-  keys: {
-    left: 0,
-    right: 0,
-    up: 0,
-    down: 0
-  },
-  player: {
-    x: 300,
-    y: 300
+  tile: {
+    x: 0,
+    y: 0
   }
 };
 
