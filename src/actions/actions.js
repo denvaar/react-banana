@@ -1,55 +1,30 @@
-export const PLAYER_MOVE = 'PLAYER_MOVE';
+export const ADD_ACTIVE_TILE = 'ADD_ACTIVE_TILE';
+export const REMOVE_INACTIVE_TILE = 'REMOVE_INACTIVE_TILE';
 
-export const MOVE_RIGHT = 'MOVE_RIGHT';
-export const MOVE_LEFT = 'MOVE_LEFT';
-export const MOVE_UP = 'MOVE_UP';
-export const MOVE_DOWN = 'MOVE_DOWN';
-export const SPACE = 'SPACE';
-
-export const UPDATE_PLAYER_POSITION = 'UPDATE_PLAYER_POSITION';
-
-
-export const playerMove = (keys) => {
-  return dispatch => { 
-    return dispatch(updatePlayerPosition(keys));
+export const addActiveTile = (data) => {
+  return dispatch => {
+    return dispatch(_addActiveTile(data));
   }
-
 }
 
-const updatePlayerPosition = (keys) => {
+export const removeInactiveTile = (index) => {
+  console.log(index);
+  return dispatch => {
+    return dispatch(_removeInactiveTile(index));
+  }
+}
+
+const _removeInactiveTile = (index) => {
   return {
-    type: UPDATE_PLAYER_POSITION,
-    keys: keys
+    type: REMOVE_INACTIVE_TILE,
+    index: index
   };
 }
 
-const moveLeft = () => {
+const _addActiveTile = (data) => {
   return {
-    type: MOVE_LEFT
+    type: ADD_ACTIVE_TILE,
+    data: data
   };
 }
 
-const moveRight = (ctx) => {
-  return {
-    type: MOVE_RIGHT,
-    context: ctx
-  };
-}
-
-const moveUp = () => {
-  return {
-    type: MOVE_UP
-  };
-}
-
-const moveDown = () => {
-  return {
-    type: MOVE_DOWN
-  };
-}
-
-const space = () => {
-  return {
-    type: SPACE
-  };
-}

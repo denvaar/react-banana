@@ -10,6 +10,7 @@
 }
 
 .grid {
+  position: relative;
   width: 600px;
   height: 600px;
   background: #505884;

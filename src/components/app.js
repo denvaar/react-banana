@@ -3,9 +3,12 @@ import { Component } from 'react';
 var classNames = require('classnames');
 import { connect } from 'react-redux';
 
-import { playerMove } from '../actions/actions';
+import {
+  addActiveTile,
+  removeInactiveTile
+} from '../actions/actions';
 
-
+/*
 var ALPHABET = {
   'A': 13,
   'B': 3,
@@ -34,26 +37,27 @@ var ALPHABET = {
   'Y': 3,
   'Z': 2
 }
-
+*/
 
 class Tile extends Component {
   constructor(props) {
     super(props);
     this.handleClick = this.handleClick.bind(this);
-    this.state = {
-      selected: false
-    };
+    this.drag = this.drag.bind(this);
   }
 
   handleClick(event) {
     event.preventDefault();
-    this.setState({ selected: !this.state.selected });
+    this.drag(event);
+  }
+ 
+  drag(event) {
+    event.dataTransfer.setData('text', JSON.stringify(this.props));
   }
 
   render() {
     var tileClass = classNames({
       'tile': true,
-      'tile--active': this.state.selected
     });
 
     let styles = {
@@ -63,6 +67,8 @@ class Tile extends Component {
     };
     return (
       <div className={tileClass}
+           draggable={"true"}
+           onDragStart={this.drag}
            style={styles}
            onClick={this.handleClick} >
         {this.props.letter}
@@ -71,21 +77,38 @@ class Tile extends Component {
   }
 }
 
-class BoardSquare extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <div className="empty-tile">?</div>
-    );
-  }
-}
 
 class App extends Component {
   constructor(props) {
     super(props);
+    this.allowDrop = this.allowDrop.bind(this);
+    this.onDrop = this.onDrop.bind(this);
+  }
+
+  componentDidMount() {
+    window.addEventListener("dragover", this.onDragEnter);
+  }
+  
+  componentWillUnmount() {
+    window.removeEventListener("dragover", this.onDragEnter);
+  }
+
+  onDragEnter(event) {
+    console.log(event.clientX, event.clientY);
+
+  }
+
+  makePile() {
+
+    var tiles = [];
+    for (var i = 0; i < 145; i++) {
+      tiles.push(<Tile key={i}
+                       letter={this.getLetter()}
+                       x={this.getRandom(170, 0)}
+                       y={this.getRandom(700, 0)}
+                       tilt={this.getRandom(11, -11)} />);
+    }
+    return tiles;
   }
 
   getRandom(max, min) {
@@ -103,24 +126,54 @@ class App extends Component {
     return letter;
   }
 
+  allowDrop(event) {
+    event.preventDefault();
+  }
+  
+  onDrop(event) {
+    event.preventDefault();
+    var data = JSON.parse(event.dataTransfer.getData('text'));
+    console.log('received', data, event.clientX, event.clientY);
+    
+    var activeTiles = this.props.activeTiles;
+    
+    var x = event.clientX - (event.clientX % 40);
+    var y = event.clientY - (event.clientY % 40);
+    
+    this.props.addActiveTile({x: y, y: x, letter: data.letter});
+    var index = this.props.inactiveTiles.findIndex(obj => obj.id === data.id);
+    this.props.removeInactiveTile(index);
+  }
 
   render() {
-    var tiles = [];
-    for (var i = 0; i < 145; i++) {
-      tiles.push(<Tile key={i}
-                       letter={this.getLetter()}
-                       x={this.getRandom(170, 0)}
-                       y={this.getRandom(700, 0)}
-                       tilt={this.getRandom(11, -11)} />);
-    }
+    var activeTiles = [];
+    this.props.activeTiles.map((tile, i) => {
+      activeTiles.push(<Tile key={i}
+                             letter={tile.letter}
+                             x={tile.x}
+                             y={tile.y}
+                             tilt={0} />);
+    });
+
+    var inactiveTiles = [];
+    this.props.inactiveTiles.map((tile, i) => {
+      inactiveTiles.push(<Tile key={i}
+                               id={tile.id}
+                               letter={tile.letter}
+                               x={this.getRandom(170, 0)}
+                               y={this.getRandom(700, 0)}
+                               tilt={this.getRandom(11, -11)} />);
+    });
 
     return (
       <div className="game">
-        <div className="grid">
-        
+        <div className="grid"
+             onDragOver={this.allowDrop}
+             onDrop={this.onDrop}>
+          {activeTiles}
         </div>
         <div className="pile">
-          {tiles}
+          {inactiveTiles}
         </div>
       </div>
     );
@@ -129,7 +182,9 @@ class App extends Component {
 
 const mapStateToProps = (state) => {
   return {
+    activeTiles: state.appReducer.activeTiles,
+    inactiveTiles: state.appReducer.inactive
   };
 }
 
-export default connect(mapStateToProps, { })(App);
+export default connect(mapStateToProps, { addActiveTile, removeInactiveTile })(App);
