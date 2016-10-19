@@ -1,37 +1,95 @@
 import { combineReducers } from 'redux';
+import merge from 'lodash/merge';
 
+import { getRandom } from '../utils/utils';
 import {
-  ADD_ACTIVE_TILE,
-  REMOVE_INACTIVE_TILE
+  UPDATE_TILE
 } from '../actions/actions';
 
 const INITIAL_STATE = {
-  activeTiles: [],
-  inactive: [
+  tiles: [
     {
       id: 1,
-      letter: 'A'
+      letter: 'B',
+      x: getRandom(170, 0),
+      y: getRandom(700, 0),
+      tilt: getRandom(15, -15),
+      isActive: false
     },
     {
       id: 2,
-      letter: 'A'
+      letter: 'A',
+      x: getRandom(170, 0),
+      y: getRandom(700, 0),
+      tilt: getRandom(15, -15),
+      isActive: false
     },
     {
       id: 3,
-      letter: 'B'
+      letter: 'N',
+      x: getRandom(170, 0),
+      y: getRandom(700, 0),
+      tilt: getRandom(15, -15),
+      isActive: false
     },
     {
       id: 4,
-      letter: 'C'
+      letter: 'A',
+      x: getRandom(170, 0),
+      y: getRandom(700, 0),
+      tilt: getRandom(15, -15),
+      isActive: false
+    },
+    {
+      id: 5,
+      letter: 'N',
+      x: getRandom(170, 0),
+      y: getRandom(700, 0),
+      tilt: getRandom(15, -15),
+      isActive: false
+    },
+    {
+      id: 6,
+      letter: 'A',
+      x: getRandom(170, 0),
+      y: getRandom(700, 0),
+      tilt: getRandom(15, -15),
+      isActive: false
+    },
+    {
+      id: 7,
+      letter: 'S',
+      x: getRandom(170, 0),
+      y: getRandom(700, 0),
+      tilt: getRandom(15, -15),
+      isActive: false
     }
   ]
 };
 
 const appReducer = (state = INITIAL_STATE, action) => {
-  switch (action.type) { 
+  switch (action.type) {
+    case UPDATE_TILE:
+      return Object.assign({}, state, {
+        tiles: [
+          ...state.tiles.slice(0, action.index),
+          action.payload,
+          ...state.tiles.slice(action.index + 1)
+        ]
+      });
+    default:
+      return state;
+  }
+}
+
+const rootReducer = combineReducers({
+  appReducer
+});
+    
+    /*
     case ADD_ACTIVE_TILE:
       return Object.assign({}, state, {
-        activeTiles: [...state.activeTiles, {
+        tiles: [...state.tiles, {
           x: action.data.x,
           y: action.data.y,
           letter: action.data.letter
@@ -40,30 +98,10 @@ const appReducer = (state = INITIAL_STATE, action) => {
     case REMOVE_INACTIVE_TILE:
       return Object.assign({}, state, {
         inactive: [
-          ...state.inactive.slice(0, action.index),
-          ...state.inactive.slice(action.index + 1)
+          ...state.tiles.slice(0, action.index),
+          ...state.tiles.slice(action.index + 1)
         ]
       });
-    default:
-      return state;
-  }
-}
-
-/*
-const player = (state = INITIAL_STATE, action) => {
-  switch (action.type) {
-    case UPDATE_PLAYER_POSITION:
-      return Object.assign({}, state, {
-        player: {x: state.player.x+7, y: 300}
-      });
-    default:
-      return state;
-  }
-}
-*/
-
-const rootReducer = combineReducers({
-  appReducer
-});
+    */
 
 export default rootReducer;

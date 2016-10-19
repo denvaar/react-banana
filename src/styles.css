@@ -24,12 +24,17 @@
   width: 40px;
   padding: -4px;
   height: 40px;
+  position: absolute;
   display: inline-block;
   font-size: 30px;
   line-height: 40px;
   text-align: center;
   font-family: 'Baloo Da', cursive;
 }   
+
+.empty-tile--hover {
+  background: #e6d755 !important;
+}
 
 .tile {
   margin: 1px;
