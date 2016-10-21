@@ -41,7 +41,6 @@ class BoardSquare extends Component {
       occupied: true
     });
     var data = JSON.parse(event.dataTransfer.getData('text'));
-    console.log('received', data, event.clientX, event.clientY);
 
     var x = event.clientY - (event.clientY % 40);
     var y = event.clientX - (event.clientX % 40);
@@ -64,6 +63,7 @@ class BoardSquare extends Component {
     return (
       <div className={boardSquareClass}
            style={this.props.styles}
+           onClick={this.props.onBoardSquareClick}
            onDragOver={this.allowDrop}
            onDragEnter={this.onDragEnter}
            onDragLeave={this.onDragLeave}

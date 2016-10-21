@@ -14,7 +14,8 @@ const INITIAL_STATE = {
       x: getRandom(170, 0),
       y: getRandom(700, 0),
       tilt: getRandom(15, -15),
-      isActive: false
+      isActive: false,
+      clicked: false
     },
     {
       id: 2,
@@ -22,7 +23,8 @@ const INITIAL_STATE = {
       x: getRandom(170, 0),
       y: getRandom(700, 0),
       tilt: getRandom(15, -15),
-      isActive: false
+      isActive: false,
+      clicked: false
     },
     {
       id: 3,
@@ -30,7 +32,8 @@ const INITIAL_STATE = {
       x: getRandom(170, 0),
       y: getRandom(700, 0),
       tilt: getRandom(15, -15),
-      isActive: false
+      isActive: false,
+      clicked: false
     },
     {
       id: 4,
@@ -38,7 +41,8 @@ const INITIAL_STATE = {
       x: getRandom(170, 0),
       y: getRandom(700, 0),
       tilt: getRandom(15, -15),
-      isActive: false
+      isActive: false,
+      clicked: false
     },
     {
       id: 5,
@@ -46,7 +50,8 @@ const INITIAL_STATE = {
       x: getRandom(170, 0),
       y: getRandom(700, 0),
       tilt: getRandom(15, -15),
-      isActive: false
+      isActive: false,
+      clicked: false
     },
     {
       id: 6,
@@ -54,7 +59,8 @@ const INITIAL_STATE = {
       x: getRandom(170, 0),
       y: getRandom(700, 0),
       tilt: getRandom(15, -15),
-      isActive: false
+      isActive: false,
+      clicked: false
     },
     {
       id: 7,
@@ -62,7 +68,8 @@ const INITIAL_STATE = {
       x: getRandom(170, 0),
       y: getRandom(700, 0),
       tilt: getRandom(15, -15),
-      isActive: false
+      isActive: false,
+      clicked: false
     }
   ]
 };

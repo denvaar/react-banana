@@ -15,18 +15,47 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.onTileClick = this.onTileClick.bind(this);
+    this.onBoardSquareClick = this.onBoardSquareClick.bind(this);
   }
 
   onTileClick(event, id, letter) {
     var index = this.props.tiles.findIndex(obj => obj.id === id);
-    this.props.updateTile({
+    
+    var clickedTiles = this.props.tiles.filter(obj => obj.clicked === true);
+    if (clickedTiles.length > 0) {
+      clickedTiles[0].clicked = false;
+
+      clickedTiles[0].x = clickedTiles[0].x + this.props.tiles[index].x;
+      this.props.tiles[index].x = clickedTiles[0].x - this.props.tiles[index].x;
+      clickedTiles[0].x = clickedTiles[0].x - this.props.tiles[index].x;
+      
+      clickedTiles[0].y = clickedTiles[0].y + this.props.tiles[index].y;
+      this.props.tiles[index].y = clickedTiles[0].y - this.props.tiles[index].y;
+      clickedTiles[0].y = clickedTiles[0].y - this.props.tiles[index].y;
+    }
+    
+    this.props.updateTile(Object.assign(
+      this.props.tiles[index], {
       id: id,
-      x: getRandom(170, 0),
-      y: getRandom(700, 0),
-      tilt: getRandom(15, -15),
-      letter: letter,
-      isActive: false
-    }, index);
+      clicked: true
+    }), index);
+  }
+
+  onBoardSquareClick(event) {
+    event.preventDefault();
+    var tile = this.props.tiles.filter(obj => obj.clicked === true)[0];
+    if (tile) {
+      console.log('doing it',event.clientY);
+      var index = this.props.tiles.findIndex(obj => obj.id === tile.id);
+      var x = event.clientY - (event.clientY % 40);
+      var y = event.clientX - (event.clientX % 40);
+      this.props.updateTile(Object.assign(
+        this.props.tiles[index], {
+        x: x,
+        y: y,
+        clicked: false
+      }), index);
+    }
   }
 
   render() {
@@ -40,7 +69,8 @@ class App extends Component {
                                  letter={tile.letter}
                                  x={tile.x}
                                  y={tile.y}
-                                 tilt={tile.tilt} />);
+                                 tilt={tile.tilt}
+                                 clicked={tile.clicked} />);
       } else {
         activeTiles.push(<Tile key={i}
                                id={tile.id}
@@ -48,7 +78,8 @@ class App extends Component {
                                letter={tile.letter}
                                x={tile.x}
                                y={tile.y}
-                               tilt={0} />);
+                               tilt={0} 
+                               clicked={tile.clicked} />);
       }
     });
 
@@ -62,6 +93,7 @@ class App extends Component {
           zIndex: 0,
         };
         droppables.push(<BoardSquare key={i}
+                                     onBoardSquareClick={this.onBoardSquareClick}
                                      tiles={this.props.tiles}
                                      updateTile={this.props.updateTile}
                                      styles={styles} />);

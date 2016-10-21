@@ -16,6 +16,7 @@ class Tile extends Component {
   render() {
     var tileClass = classNames({
       'tile': true,
+      'tile--active': this.props.clicked
     }); 
 
     let styles = { 
