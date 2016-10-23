@@ -36,21 +36,21 @@ class BoardSquare extends Component {
 
   onDrop(event) {
     event.preventDefault();
+    
     this.setState({
       dragOver: false,
       occupied: true
     });
+    
     var data = JSON.parse(event.dataTransfer.getData('text'));
 
-    var x = event.clientY - (event.clientY % 40);
-    var y = event.clientX - (event.clientX % 40);
     var index = this.props.tiles.findIndex(obj => obj.id === data.id);
     this.props.updateTile({
-      id: data.id,
-      x: x,
-      y: y,
+      id: this.props.tiles[index].id,
+      x: this.props.y,
+      y: this.props.x,
       tilt: 0,
-      letter: data.letter,
+      letter: this.props.tiles[index].letter,
       isActive: true
     }, index);
   }
@@ -63,7 +63,7 @@ class BoardSquare extends Component {
     return (
       <div className={boardSquareClass}
            style={this.props.styles}
-           onClick={this.props.onBoardSquareClick}
+           onClick={() => { this.props.onBoardSquareClick(event, this.props.x,this.props.y) }}
            onDragOver={this.allowDrop}
            onDragEnter={this.onDragEnter}
            onDragLeave={this.onDragLeave}

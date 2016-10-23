@@ -1,13 +1,14 @@
 import { combineReducers } from 'redux';
 import merge from 'lodash/merge';
 
-import { getRandom } from '../utils/utils';
+import { getRandom, buildInitialState } from '../utils/utils';
 import {
   UPDATE_TILE
 } from '../actions/actions';
 
 const INITIAL_STATE = {
-  tiles: [
+  tiles: buildInitialState()
+  /*[
     {
       id: 1,
       letter: 'B',
@@ -71,7 +72,7 @@ const INITIAL_STATE = {
       isActive: false,
       clicked: false
     }
-  ]
+  ]*/
 };
 
 const appReducer = (state = INITIAL_STATE, action) => {
@@ -92,23 +93,5 @@ const appReducer = (state = INITIAL_STATE, action) => {
 const rootReducer = combineReducers({
   appReducer
 });
-    
-    /*
-    case ADD_ACTIVE_TILE:
-      return Object.assign({}, state, {
-        tiles: [...state.tiles, {
-          x: action.data.x,
-          y: action.data.y,
-          letter: action.data.letter
-        }]
-      });
-    case REMOVE_INACTIVE_TILE:
-      return Object.assign({}, state, {
-        inactive: [
-          ...state.tiles.slice(0, action.index),
-          ...state.tiles.slice(action.index + 1)
-        ]
-      });
-    */
 
 export default rootReducer;

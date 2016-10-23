@@ -30,8 +30,9 @@ class Tile extends Component {
            draggable={"true"}
            onDragStart={this.drag}
            style={styles}
+           onDoubleClick={() => { this.props.onTileDoubleClick(event, this.props.id, this.props.letter) }} 
            onClick={() => { this.props.onTileClick(event, this.props.id, this.props.letter) }}> 
-        {this.props.letter}
+        {this.props.isActive && this.props.letter}
       </div>
     );
   }
