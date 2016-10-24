@@ -7,72 +7,16 @@ import {
 } from '../actions/actions';
 
 const INITIAL_STATE = {
-  tiles: buildInitialState()
-  /*[
-    {
-      id: 1,
-      letter: 'B',
-      x: getRandom(170, 0),
-      y: getRandom(700, 0),
-      tilt: getRandom(15, -15),
-      isActive: false,
-      clicked: false
-    },
-    {
-      id: 2,
-      letter: 'A',
-      x: getRandom(170, 0),
-      y: getRandom(700, 0),
-      tilt: getRandom(15, -15),
-      isActive: false,
-      clicked: false
-    },
-    {
-      id: 3,
-      letter: 'N',
-      x: getRandom(170, 0),
-      y: getRandom(700, 0),
-      tilt: getRandom(15, -15),
-      isActive: false,
-      clicked: false
-    },
-    {
-      id: 4,
-      letter: 'A',
-      x: getRandom(170, 0),
-      y: getRandom(700, 0),
-      tilt: getRandom(15, -15),
-      isActive: false,
-      clicked: false
-    },
-    {
-      id: 5,
-      letter: 'N',
-      x: getRandom(170, 0),
-      y: getRandom(700, 0),
-      tilt: getRandom(15, -15),
-      isActive: false,
-      clicked: false
-    },
-    {
-      id: 6,
-      letter: 'A',
-      x: getRandom(170, 0),
-      y: getRandom(700, 0),
-      tilt: getRandom(15, -15),
-      isActive: false,
-      clicked: false
-    },
-    {
-      id: 7,
-      letter: 'S',
-      x: getRandom(170, 0),
-      y: getRandom(700, 0),
-      tilt: getRandom(15, -15),
-      isActive: false,
-      clicked: false
+  tiles: buildInitialState(),
+  time: 100000,
+  words: {
+    "test": {
+      startX: 0,
+      startY: 0,
+      endX: 160,
+      endY: 0
     }
-  ]*/
+  }
 };
 
 const appReducer = (state = INITIAL_STATE, action) => {

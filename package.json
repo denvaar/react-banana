@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "classnames": "^2.2.5",
+    "fs": "0.0.1-security",
     "lodash": "^4.16.4",
     "react": "^15.3.2",
     "react-addons-css-transition-group": "^15.3.2",

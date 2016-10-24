@@ -5,6 +5,19 @@ body {
   background: #3F51B5;
 }
 
+.score-board {
+  color: salmon;
+  font-family: 'Consolas', sans-serif;
+  padding: 5px;
+}
+.score-board span {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.score-board .active { color: #fff; }
+.score-board .inactive { color: salmon; }
+.score-board .words { color: #FFEB3B; }
+
 .pile {
   position: relative;
   background: #3F51B5;
@@ -14,6 +27,7 @@ body {
 
 .grid {
   position: relative;
+  padding: 0 6px 6px 0;
   width: 800px;
   height: 600px;
   background: #009688;
@@ -23,6 +37,7 @@ body {
 
 .empty-tile {
   color: #505884;
+  border: 1px solid #009284;
   margin: 1px;
   width: 40px;
   padding: -4px;
@@ -44,6 +59,7 @@ body {
 .tile {
   transition: all 0.3s ease-in-out;
   margin: 1px;
+  border: 1px solid #f3dda1;
   position: absolute;
   display: inline-block;
   cursor: pointer;

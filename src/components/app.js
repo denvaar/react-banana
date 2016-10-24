@@ -9,7 +9,7 @@ import {
 
 import BoardSquare from './boardSquare';
 import Tile from './tile';
-
+import CountdownTimer from './timer';
 
 class App extends Component {
   constructor(props) {
@@ -20,12 +20,39 @@ class App extends Component {
   }
 
   onTileDoubleClick(event, id, letter) {
+    var index = this.props.tiles.findIndex(obj => obj.id === id);
     var tile = this.props.tiles.filter(obj => { return(obj.id === id) })[0];
+    
     if (tile.isActive) {
       // put tile into pile
+      this.props.updateTile(Object.assign(
+        tile, {
+        id: id,
+        x: getRandom(150, 10),
+        y: getRandom(750, 20),
+        isActive: false
+      }), index);
     } else {
       // take tile out of pile
     
+      var x = tile.x - (tile.x % 40);
+      var y = tile.y - (tile.y % 40);
+
+      var existingTiles = this.props.tiles.filter(obj => {
+        return (obj.isActive && (obj.x === x && obj.y === y));
+      });
+      if (existingTiles.length === 0) {
+        this.props.updateTile(Object.assign(
+          tile, {
+          id: id,
+          x: x,
+          y: y,
+          isActive: true
+        }), index);
+      } else {
+        console.log("occupied");
+      }
+
     }
   }
 
@@ -64,6 +91,46 @@ class App extends Component {
         y: _x,
         clicked: false
       }), index);
+      this.doWordCheck();
+    }
+  }
+
+  doWordCheck() {
+    // loop through each row.
+    for (var x = 0; x < 15; x++) {
+      // get all of the letters that are on this row.
+      var letters = this.props.tiles.filter(letter => {
+        return (letter.x === x*40) && letter.isActive;
+      });
+      // if there are more than one letters on same row.
+      if (letters.length > 1) {
+        console.log(letters);
+        var word = "";
+        for (var y = 0; y < 20; y++) {
+
+          var nextTile = this.props.tiles.find(obj => {
+            return (obj.isActive &&
+                    (obj.x === x*40 &&
+                     obj.y === y*40)
+            );
+          });
+          
+          if (nextTile) {
+            word = word + nextTile.letter;
+          } else {
+            if (word.length > 1) console.log(word);
+            word = "";
+          }
+          /*
+          var letters = this.props.tiles.filter(letter => {
+            return (letter.isActive &&
+                    (letter.x === x*40 &&
+                    letter.y === y*40));
+          });
+          if (letters.length > 0) { word = word + letters[0].letter; }
+          */
+        }
+      }
     }
   }
 
@@ -107,6 +174,12 @@ class App extends Component {
 
     return (
       <div className="game">
+        <div className="score-board">
+          <CountdownTimer initialTimeRemaining={this.props.time} />
+          <span className="active">Active tiles: {activeTiles.length}</span>
+          <span className="inactive">Inactive tiles: {inactiveTiles.length}</span>
+          <span className="words">Words: {Object.keys(this.props.words).length}</span>
+        </div>
         <div className="pile">
           {inactiveTiles}
         </div>
@@ -123,6 +196,8 @@ class App extends Component {
 const mapStateToProps = (state) => {
   return {
     tiles: state.appReducer.tiles,
+    time: state.appReducer.time,
+    words: state.appReducer.words
   };
 }
 
