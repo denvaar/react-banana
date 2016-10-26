@@ -17,6 +17,7 @@ class App extends Component {
     this.onTileClick = this.onTileClick.bind(this);
     this.onTileDoubleClick = this.onTileDoubleClick.bind(this);
     this.onBoardSquareClick = this.onBoardSquareClick.bind(this);
+    this.doWordCheck = this.doWordCheck.bind(this);
   }
 
   onTileDoubleClick(event, id, letter) {
@@ -96,6 +97,7 @@ class App extends Component {
   }
 
   doWordCheck() {
+    var allWords = [];
     // loop through each row.
     for (var x = 0; x < 15; x++) {
       // get all of the letters that are on this row.
@@ -104,7 +106,6 @@ class App extends Component {
       });
       // if there are more than one letters on same row.
       if (letters.length > 1) {
-        console.log(letters);
         var word = "";
         for (var y = 0; y < 20; y++) {
 
@@ -118,18 +119,64 @@ class App extends Component {
           if (nextTile) {
             word = word + nextTile.letter;
           } else {
-            if (word.length > 1) console.log(word);
+            if (word.length > 1) {
+              allWords.push({
+                [word]: {
+                  startY: x * 40,
+                  startX: (y - word.length) * 40,
+                  endX: (y - 1) * 40,
+                  length: word.length,
+                  direction: "horizontal"
+                }
+              });
+            }
             word = "";
           }
-          /*
-          var letters = this.props.tiles.filter(letter => {
-            return (letter.isActive &&
-                    (letter.x === x*40 &&
-                    letter.y === y*40));
-          });
-          if (letters.length > 0) { word = word + letters[0].letter; }
-          */
         }
+      }
+    }
+  
+    // loop through each column.
+    for (var y = 0; y < 20; y++) {
+      // get all of the letters that are on this column.
+      var letters = this.props.tiles.filter(letter => {
+        return (letter.y === y*40) && letter.isActive;
+      });
+      // if there are more than one letters on same row.
+      if (letters.length > 1) {
+        var word = "";
+        for (var x = 0; x < 15; x++) {
+
+          var nextTile = this.props.tiles.find(obj => {
+            return (obj.isActive &&
+                    (obj.x === x*40 &&
+                     obj.y === y*40)
+            );
+          });
+          
+          if (nextTile) {
+            word = word + nextTile.letter;
+          } else {
+            if (word.length > 1) {
+              allWords.push({
+                [word]: {
+                  startY: (x - word.length) * 40,
+                  startX: y * 40,
+                  endY: (x - 1) * 40,
+                  length: word.length,
+                  direction: "vertical"
+                }
+              });
+            }
+            word = "";
+          }
+        }
+      }
+    }
+    console.log(allWords);
+    for (var i = 0; i < allWords.length; i++) {
+      for (var j = 1; j < allWords.length; j++) {
+        console.log("compare", allWords[i], allWords[j]);
       }
     }
   }
@@ -175,6 +222,7 @@ class App extends Component {
     return (
       <div className="game">
         <div className="score-board">
+          <button onClick={this.doWordCheck}>Check</button>
           <CountdownTimer initialTimeRemaining={this.props.time} />
           <span className="active">Active tiles: {activeTiles.length}</span>
           <span className="inactive">Inactive tiles: {inactiveTiles.length}</span>
