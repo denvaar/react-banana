@@ -52,100 +52,90 @@ export const buildInitialState = () => {
   });
   return results;
 }
-/*
-export const getNextTile = (x, y, prev = null, done = [], tiles) => {
-  if (!done.includes('left')) {
-    // check left
-    if (tiles[`${x-1},${y}`] && prev !== 'right') {
-      return tiles[`${x},${y}`].letter + getNextTile(x-1, y, 'left', tiles);
-    }
-  }
-  if (!done.includes('right')) {
-    // check to the right
-    if (tiles[`${x+1},${y}`] && prev !== 'left') {
-      return tiles[`${x},${y}`].letter + getNextTile(x+1, y, 'right', tiles);
-    }
-  }
-  if (!done.includes('up')) {
-    // Check above
-    if (tiles[`${x},${y-1}`] && prev !== 'down') {
-      return getNextTile(x, y-1, 'up', tiles) + tiles[`${x},${y}`].letter;
-    }
-  }
-  if (!done.includes('down')) {
-    // check below
-    if (tiles[`${x},${y+1}`] && prev !== 'up') {
-      return tiles[`${x},${y}`].letter + getNextTile(x, y+1, 'down', tiles);
-    }
-  }
 
-  if (prev === null) {
-    console.log(done);
-    return tiles[`${x},${y}`].letter;
-  } else {
-    done.push(prev);
-    return getNextTile(x, y, null, done, tiles);
-  }
-}
-*/
-var testTiles = {
-  ['0,0']: {letter:'u', visited: false, x: 0, y: 0},
-  ['0,1']: {letter:'t', visited: false, x: 0, y: 1},
-  ['0,2']: {letter:'o', visited: false, x: 0, y: 2},
-  ['1,2']: {letter:'x', visited: false, x: 1, y: 2},
-  ['1,0']: {letter:'t', visited: false, x: 1, y: 0},
-  ['2,0']: {letter:'p', visited: false, x: 2, y: 0},
-  ['3,0']: {letter:'r', visited: false, x: 3, y: 0}
+var testTiles = { 
+  ['0,0']: {letter:'z', visited: false, x: 0, y: 0}, 
+  ['0,1']: {letter:'i', visited: false, x: 0, y: 1}, 
+  ['0,2']: {letter:'y', visited: false, x: 0, y: 2}, 
+  ['1,2']: {letter:'u', visited: false, x: 1, y: 2}, 
+  ['1,0']: {letter:'e', visited: false, x: 1, y: 0},
+  ['3,2']: {letter:'m', visited: false, x: 3, y: 2},
+  ['1,3']: {letter:'y', visited: false, x: 1, y: 3},
+  ['2,0']: {letter:'v', visited: false, x: 2, y: 0},
+  ['3,1']: {letter:'r', visited: false, x: 3, y: 1},
+  ['4,1']: {letter:'u', visited: false, x: 4, y: 1},
+  ['5,1']: {letter:'i', visited: false, x: 5, y: 1},
+  ['5,0']: {letter:'s', visited: false, x: 5, y: 0},
+  ['5,2']: {letter:'v', visited: false, x: 5, y: 2},
+  ['6,1']: {letter:'t', visited: false, x: 6, y: 1},
+  ['3,0']: {letter:'p', visited: false, x: 3, y: 0}
 };
 
-var tileStack = [];
+var tileStack = []; 
 
-const _getNextTileCoords = (x, y) => {
-  // check left
-  if (testTiles[`${x-1},${y}`] && !testTiles[`${x-1},${y}`].visited) {
-    return [`${x-1},${y}`, 'left'];
-  }
+const _getNextTileCoords = (x, y, z) => {
+  var canGoRight = (testTiles[`${x+1},${y}`] && !testTiles[`${x+1},${y}`].visited);
+  var canGoDown = (testTiles[`${x},${y+1}`] && !testTiles[`${x},${y+1}`].visited);
+  var canGoUp = (testTiles[`${x},${y-1}`] && !testTiles[`${x},${y-1}`].visited);
+  var canGoLeft = (testTiles[`${x-1},${y}`] && !testTiles[`${x-1},${y}`].visited);
+  
+  if (z === 'right' && canGoRight) return [`${x+1},${y}`, 'right'];
+  if (z === 'down' && canGoDown) return [`${x},${y+1}`, 'down'];
   // check right
-  if (testTiles[`${x+1},${y}`] && !testTiles[`${x+1},${y}`].visited) {
+  if (testTiles[`${x+1},${y}`] && !testTiles[`${x+1},${y}`].visited && !canGoLeft) {
     return [`${x+1},${y}`, 'right'];
   }
-  // check up
-  if (testTiles[`${x},${y-1}`] && !testTiles[`${x},${y-1}`].visited) {
-    return [`${x},${y-1}`, 'up'];
-  }
+  
   // check down
-  if (testTiles[`${x},${y+1}`] && !testTiles[`${x},${y+1}`].visited) {
+  if (testTiles[`${x},${y+1}`] && !testTiles[`${x},${y+1}`].visited && !canGoUp) {
     return [`${x},${y+1}`, 'down'];
   }
+  
   return undefined; 
 }
 
-export const depthFirstSearch = (x, y) => {
+const depthFirstSearch = (x, y) => {
   tileStack.push(testTiles[`${x},${y}`]);
   testTiles[`${x},${y}`].visited = true;
   var words = testTiles[`${x},${y}`].letter;
   var directionDelta = null;
-  
+  var z = null;
   while (tileStack.length > 0) {
-    var tile = tileStack[tileStack.length - 1];
-    var coords = _getNextTileCoords(tile.x, tile.y);
+    var tile = tileStack[tileStack.length - 1]; 
+    var coords = _getNextTileCoords(tile.x, tile.y, z);
+    
     if (coords) {
       if (directionDelta !== coords[1] && directionDelta !== null) {
-        words += ' ';
+        words += ';';
         words = words + tile.letter;
         testTiles[coords[0]].visited = false;
-      } 
-      else {
+      } else {
         testTiles[coords[0]].visited = true;
         words = words + testTiles[coords[0]].letter;
         tileStack.push(testTiles[coords[0]]);
-      }
-      
+      }   
+      if (coords[1] !== directionDelta) z = coords[1];
       directionDelta = coords[1];
     } else {
       tileStack.pop();
-      words = words + '-';
-    }
+      directionDelta = '';
+      words = words + '/';
+    }   
   }
+  
+  
+  for (var key in testTiles) {
+    // skip loop if the property is from prototype
+    if (!testTiles.hasOwnProperty(key)) continue;
+
+    var obj = testTiles[key];
+    obj.visited = false;
+  }
+  
   return words;
 }
+
+
+
+console.log(depthFirstSearch(0,0));
+console.log(depthFirstSearch(5,0));
