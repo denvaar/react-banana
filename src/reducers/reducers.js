@@ -9,13 +9,9 @@ import {
 const INITIAL_STATE = {
   tiles: buildInitialState(),
   time: 100000,
-  words: {
-    "test": {
-      startX: 0,
-      startY: 0,
-      endX: 160,
-      endY: 0
-    }
+  words: [],
+  testTiles: {
+
   }
 };
 
@@ -28,6 +24,17 @@ const appReducer = (state = INITIAL_STATE, action) => {
           action.payload,
           ...state.tiles.slice(action.index + 1)
         ]
+      });
+    case GRAPH_ADD:
+      return Object.assign({}, state, {
+        testTiles: {
+          [`${action.x},${action.y}`]: {
+            x: action.x,
+            y: action.y,
+            visited: false,
+            canVisitAgain: false
+          }
+        }
       });
     default:
       return state;

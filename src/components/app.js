@@ -2,7 +2,7 @@ import React from 'react';
 import { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { getRandom } from '../utils/utils';
+import { getRandom, depthFirstSearch } from '../utils/utils';
 import {
   updateTile,
 } from '../actions/actions';
@@ -97,88 +97,14 @@ class App extends Component {
   }
 
   doWordCheck() {
-    var allWords = [];
-    // loop through each row.
-    for (var x = 0; x < 15; x++) {
-      // get all of the letters that are on this row.
-      var letters = this.props.tiles.filter(letter => {
-        return (letter.x === x*40) && letter.isActive;
-      });
-      // if there are more than one letters on same row.
-      if (letters.length > 1) {
-        var word = "";
-        for (var y = 0; y < 20; y++) {
-
-          var nextTile = this.props.tiles.find(obj => {
-            return (obj.isActive &&
-                    (obj.x === x*40 &&
-                     obj.y === y*40)
-            );
-          });
-          
-          if (nextTile) {
-            word = word + nextTile.letter;
-          } else {
-            if (word.length > 1) {
-              allWords.push({
-                [word]: {
-                  startY: x * 40,
-                  startX: (y - word.length) * 40,
-                  endX: (y - 1) * 40,
-                  length: word.length,
-                  direction: "horizontal"
-                }
-              });
-            }
-            word = "";
-          }
-        }
-      }
-    }
-  
-    // loop through each column.
-    for (var y = 0; y < 20; y++) {
-      // get all of the letters that are on this column.
-      var letters = this.props.tiles.filter(letter => {
-        return (letter.y === y*40) && letter.isActive;
-      });
-      // if there are more than one letters on same row.
-      if (letters.length > 1) {
-        var word = "";
-        for (var x = 0; x < 15; x++) {
-
-          var nextTile = this.props.tiles.find(obj => {
-            return (obj.isActive &&
-                    (obj.x === x*40 &&
-                     obj.y === y*40)
-            );
-          });
-          
-          if (nextTile) {
-            word = word + nextTile.letter;
-          } else {
-            if (word.length > 1) {
-              allWords.push({
-                [word]: {
-                  startY: (x - word.length) * 40,
-                  startX: y * 40,
-                  endY: (x - 1) * 40,
-                  length: word.length,
-                  direction: "vertical"
-                }
-              });
-            }
-            word = "";
-          }
-        }
-      }
-    }
-    console.log(allWords);
-    for (var i = 0; i < allWords.length; i++) {
-      for (var j = 1; j < allWords.length; j++) {
-        console.log("compare", allWords[i], allWords[j]);
-      }
-    }
+    /*
+      depth first search for each
+      tile that is placed without
+      another above and to the left
+      of it.
+    */
+    var words = '';
+    depthFirstSearch(); 
   }
 
   render() {
@@ -245,7 +171,8 @@ const mapStateToProps = (state) => {
   return {
     tiles: state.appReducer.tiles,
     time: state.appReducer.time,
-    words: state.appReducer.words
+    words: state.appReducer.words,
+    testTiles: state.appReducer.testTiles
   };
 }
 
