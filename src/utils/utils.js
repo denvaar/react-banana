@@ -57,38 +57,40 @@ export const buildInitialState = () => {
 var tileStack = [];
 
 
-const _getNextTileCoords = (x, y, z) => {
-  var canGoRight = (testTiles[`${x+1},${y}`] && !testTiles[`${x+1},${y}`].visited);
-  var canGoDown = (testTiles[`${x},${y+1}`] && !testTiles[`${x},${y+1}`].visited);
-  var canGoUp = (testTiles[`${x},${y-1}`] && !testTiles[`${x},${y-1}`].visited);
-  var canGoLeft = (testTiles[`${x-1},${y}`] && !testTiles[`${x-1},${y}`].visited);
+const _getNextTileCoords = (x, y, z, testTiles) => {
+  var canGoRight = (testTiles[`${x+40},${y}`] && !testTiles[`${x+40},${y}`].visited);
+  var canGoDown = (testTiles[`${x},${y+40}`] && !testTiles[`${x},${y+40}`].visited);
+  var canGoUp = (testTiles[`${x},${y-40}`] && !testTiles[`${x},${y-40}`].visited);
+  var canGoLeft = (testTiles[`${x-40},${y}`] && !testTiles[`${x-40},${y}`].visited);
 
   if (canGoRight) {
-    if (testTiles[`${x-1},${y}`] && testTiles[`${x-1},${y}`].visited === false)
+    if (testTiles[`${x-40},${y}`] && testTiles[`${x-40},${y}`].visited === false)
       canGoRight = false;
   }
 
-  if (z === 'right' && canGoRight) return [`${x+1},${y}`, 'right'];
-  if (z === 'down' && canGoDown) return [`${x},${y+1}`, 'down'];
+  if (z === 'right' && canGoRight) return [`${x+40},${y}`, 'right'];
+  if (z === 'down' && canGoDown) return [`${x},${y+40}`, 'down'];
 
 
   // check right
-  if (testTiles[`${x+1},${y}`]) {
-    if ((!testTiles[`${x+1},${y}`].visited || testTiles[`${x+1},${y}`].canVisitAgain) &&
+  if (testTiles[`${x+40},${y}`]) {
+    if ((!testTiles[`${x+40},${y}`].visited || testTiles[`${x+40},${y}`].canVisitAgain) &&
         !canGoLeft) {
-      return [`${x+1},${y}`, 'right'];
+      return [`${x+40},${y}`, 'right'];
     }
   }
 
   // check down
-  if (testTiles[`${x},${y+1}`] && !testTiles[`${x},${y+1}`].visited && !canGoUp) {
-    return [`${x},${y+1}`, 'down'];
+  if (testTiles[`${x},${y+40}`]) {
+    if (!testTiles[`${x},${y+40}`].visited && !canGoUp) {
+      return [`${x},${y+40}`, 'down'];
+    }
   }
 
   return undefined;
 }
 
-export const depthFirstSearch = (x, y) => {
+export const depthFirstSearch = (x, y, testTiles) => {
   tileStack.push(testTiles[`${x},${y}`]);
   testTiles[`${x},${y}`].visited = true;
   var words = testTiles[`${x},${y}`].letter;
@@ -96,7 +98,7 @@ export const depthFirstSearch = (x, y) => {
   var z = null;
   while (tileStack.length > 0) {
     var tile = tileStack[tileStack.length - 1];
-    var nextTile = _getNextTileCoords(tile.x, tile.y, z);
+    var nextTile = _getNextTileCoords(tile.x, tile.y, z, testTiles);
 
     if (nextTile) {
       if (directionDelta !== nextTile[1] && directionDelta !== null) {
@@ -107,15 +109,15 @@ export const depthFirstSearch = (x, y) => {
 
       } else {
         var c = nextTile[0].split(',');
-        if (testTiles[`${c[0]-1},${c[1]}`] &&
+        if (testTiles[`${c[0]-40},${c[1]}`] &&
             directionDelta !== null &&
-            testTiles[`${c[0]-1},${c[1]}`].visited === false) {
+            testTiles[`${c[0]-40},${c[1]}`].visited === false) {
           testTiles[nextTile[0]].canVisitAgain = true;
-        } else if (testTiles[`${c[0]},${c[1]-1}`] &&
+        } else if (testTiles[`${c[0]},${c[1]-40}`] &&
                    directionDelta !== null &&
-                   testTiles[`${c[0]},${c[1]-2}`] &&
-                   testTiles[`${c[0]-1},${c[1]-1}`] &&
-                   testTiles[`${c[0]},${c[1]-1}`].visited === false) {
+                   testTiles[`${c[0]},${c[1]-(40*2)}`] &&
+                   testTiles[`${c[0]-40},${c[1]-40}`] &&
+                   testTiles[`${c[0]},${c[1]-40}`].visited === false) {
           testTiles[nextTile[0]].canVisitAgain = true;
           words = words + testTiles[nextTile[0]].letter;
           tileStack.pop();
@@ -132,7 +134,7 @@ export const depthFirstSearch = (x, y) => {
     } else {
       tileStack.pop();
       directionDelta = '';
-      words = words + '/';
+      //words = words + '/'; // for debugging
     }
   }
 
@@ -143,6 +145,6 @@ export const depthFirstSearch = (x, y) => {
     obj.visited = false;
   }
 
-  return words;
+  return (words.length > 1) ? words: '';
 }
 

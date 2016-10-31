@@ -3,7 +3,11 @@ import merge from 'lodash/merge';
 
 import { getRandom, buildInitialState } from '../utils/utils';
 import {
-  UPDATE_TILE
+  UPDATE_TILE,
+  GRAPH_ADD,
+  GRAPH_REMOVE,
+  UPDATE_TEST_TILE,
+  UPDATE_WORDS
 } from '../actions/actions';
 
 const INITIAL_STATE = {
@@ -17,6 +21,11 @@ const INITIAL_STATE = {
 
 const appReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case UPDATE_WORDS:
+      return {
+        ...state,
+        words: action.words
+      };
     case UPDATE_TILE:
       return Object.assign({}, state, {
         tiles: [
@@ -26,16 +35,49 @@ const appReducer = (state = INITIAL_STATE, action) => {
         ]
       });
     case GRAPH_ADD:
-      return Object.assign({}, state, {
+      return { 
+        ...state,
         testTiles: {
+          ...state.testTiles,
           [`${action.x},${action.y}`]: {
             x: action.x,
             y: action.y,
+            letter: action.letter,
             visited: false,
             canVisitAgain: false
           }
         }
+      }
+    case GRAPH_REMOVE:
+      var testTiles = {};
+      Object.keys(state.testTiles).forEach(key => {
+        if (key !== action.key) testTiles[key] = state.testTiles[key];
       });
+      console.log(action.key);
+      return {
+        ...state,
+        testTiles: {
+          ...testTiles
+        }
+      }
+    case UPDATE_TEST_TILE:
+      var testTiles = {};
+      Object.keys(state.testTiles).forEach(key => {
+        if (key !== action.key) {
+          testTiles[key] = state.testTiles[key];
+        }
+      });
+      return { 
+        ...state,
+        testTiles: {
+          ...testTiles,
+          [`${action.x},${action.y}`]: {
+            ...state.testTiles[action.key],
+            x: action.x,
+            y: action.y
+          }
+        }
+      }
     default:
       return state;
   }

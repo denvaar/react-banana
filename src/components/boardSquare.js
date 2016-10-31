@@ -44,6 +44,8 @@ class BoardSquare extends Component {
     
     var data = JSON.parse(event.dataTransfer.getData('text'));
 
+    this.props.updateTestTile(`${data.y},${data.x}`, this.props.x, this.props.y);
+
     var index = this.props.tiles.findIndex(obj => obj.id === data.id);
     this.props.updateTile({
       id: this.props.tiles[index].id,
