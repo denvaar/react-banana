@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { createStore, applyMiddleware, compose } from 'redux';
-import thunkMiddleware from 'redux-thunk'
+//import { Provider } from 'react-redux';
+//import { createStore, applyMiddleware, compose } from 'redux';
+//import thunkMiddleware from 'redux-thunk'
 
-import reducers from './reducers/reducers';
+//import reducers from './reducers/reducers';
 import App from './components/app';
 import style from './styles.css';
-
+/*
 const createStoreWithMiddleware = compose(
   applyMiddleware(thunkMiddleware),
   window.devToolsExtension ? window.devToolsExtension() : f => f
@@ -19,5 +19,11 @@ ReactDOM.render(
   </Provider>
   , document.getElementById('app')
 );
+*/
 
+
+ReactDOM.render(
+  <App />
+  , document.getElementById('app')
+);
 module.hot.accept();

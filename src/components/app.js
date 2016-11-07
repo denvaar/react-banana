@@ -1,8 +1,9 @@
 import React from 'react';
 import { Component } from 'react';
-import { connect } from 'react-redux';
+//import { connect } from 'react-redux';
 
 import { getRandom, depthFirstSearch } from '../utils/utils';
+/*
 import {
   updateTile,
   addToGraph,
@@ -10,20 +11,71 @@ import {
   updateTestTile,
   updateWords
 } from '../actions/actions';
-
+*/
 import BoardSquare from './boardSquare';
 import Tile from './tile';
-import CountdownTimer from './timer';
 
-class App extends Component {
+const buildTestTiles = () => {
+  let tiles = [];
+  let i = 0;
+  for (var y = 0; y < 100; y++) {
+    for (var x = 0; x < 10; x++) {
+      tiles.push({
+        id: i,
+        letter: String.fromCharCode(97+x+y),
+        x: x*40,
+        y: y*40,
+        isSelected: false
+      });
+      i++;
+    }
+  }
+  return tiles;
+}
+
+export default class App extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      tiles: buildTestTiles(),
+    };
+    
     this.onTileClick = this.onTileClick.bind(this);
     this.onTileDoubleClick = this.onTileDoubleClick.bind(this);
-    this.onBoardSquareClick = this.onBoardSquareClick.bind(this);
+    this.onCellClick = this.onCellClick.bind(this);
     this.doWordCheck = this.doWordCheck.bind(this);
+    
+    this.cells = this.setupGrid();
+    
+    document.addEventListener("keydown", (event) => {
+      if (event.which === 65) this.spacePressed = true;
+    }, false);
+    document.addEventListener("keyup", (event) => {
+      if (event.which === 65) this.spacePressed = false;
+    }, false);
   }
 
+  setupGrid() {
+    let cells = []; 
+    var i = 0;
+    for (var y = 0; y < 15; y++) {
+      for (var x = 0; x < 20; x++) {
+        let styles = { 
+          top: y * 40, 
+          left: x * 40, 
+          zIndex: 0
+        };  
+        cells.push(<div key={i}
+                        className={"empty-tile"}
+                        style={styles}
+                        onClick={this.onCellClick}
+                   ></div>);
+        i++;
+      }   
+    }
+    return cells;
+  } 
+  /*
   componentWillReceiveProps(nextProps) {
     if (nextProps.testTiles !== this.props.testTiles) {
       var startTiles = nextProps.tiles.filter(tile => {
@@ -34,7 +86,7 @@ class App extends Component {
       this.doWordCheck(nextProps.testTiles, startTiles);
     }
   }
-  
+  */
   componentDidUpdate(prevProps, prevState) {
     
   }
@@ -78,13 +130,62 @@ class App extends Component {
           isActive: true
         }), index);
       } else {
-        console.log("occupied");
       }
 
     }
   }
 
   onTileClick(event, id, letter) {
+    let tile = {
+      ...this.state.tiles[id],
+      isSelected: !this.state.tiles[id].isSelected
+    };
+    // Is space key pressed?
+    if (this.spacePressed) {
+      this.setState({
+        tiles: [
+          ...this.state.tiles.slice(0, id),
+          tile,
+          ...this.state.tiles.slice(id + 1)
+        ]
+      });
+    } else {
+      let selectedTiles = this.state.tiles.filter(obj => obj.isSelected);
+      if (selectedTiles.length === 1) {
+        // swap coordinates with other tile. 
+        let temp = {
+          x: selectedTiles[0].x,
+          y: selectedTiles[0].y,
+        };
+        selectedTiles[0] = {
+          ...selectedTiles[0],
+          x: tile.x,
+          y: tile.y,
+          isSelected: false
+        };
+        tile = { ...tile, ...temp, isSelected: false};
+        console.log(selectedTiles[0].id, tile.id) 
+        let tilesCopy = [
+          ...this.state.tiles.slice(0, tile.id),
+          tile,
+          ...this.state.tiles.slice(tile.id + 1)
+        ];
+        tilesCopy = [
+          ...tilesCopy.slice(0, selectedTiles[0].id),
+          selectedTiles[0],
+          ...tilesCopy.slice(selectedTiles[0].id + 1)
+        ];
+        
+        
+        this.setState({
+          tiles: tilesCopy
+        });
+      }
+
+    }
+
+
+    /*
     var index = this.props.tiles.findIndex(obj => obj.id === id);
 
     var clickedTiles = this.props.tiles.filter(obj => obj.clicked === true);
@@ -114,9 +215,32 @@ class App extends Component {
       id: id,
       clicked: (clickedTiles.length > 0) ? false : true
     }), index);
+    */
   }
 
-  onBoardSquareClick(event, _x, _y) {
+  onCellClick(event, _x, _y) {
+    console.log(event.target.style.left, event.target.style.top);
+    
+    var selectedTiles = this.state.tiles.filter(tile => tile.isSelected);
+    
+    if (selectedTiles.length === 1) {
+      let newCoords = {
+        x: event.target.style.left.split("px")[0],
+        y: event.target.style.top.split("px")[0]
+      };
+      this.setState({
+        tiles: [
+          ...this.state.tiles.slice(0, selectedTiles[0].id),
+          {
+            ...selectedTiles[0],
+            ...newCoords,
+            isSelected: false
+          },
+          ...this.state.tiles.slice(selectedTiles[0].id + 1)
+        ]
+      });
+    }
+    /*
     var tile = this.props.tiles.filter(obj => obj.clicked === true)[0];
     if (tile) {
       
@@ -133,7 +257,7 @@ class App extends Component {
       }), index);
       this.doWordCheck();
     }
-
+    */
   }
 
   doWordCheck(testTiles, startTiles = []) {
@@ -154,11 +278,9 @@ class App extends Component {
       return s !== "";
     }));
   }
-
+  
   render() {
-    var activeTiles = [];
-    var inactiveTiles = [];
-    
+    /* 
     this.props.tiles.map((tile, i) => {
       if (!tile.isActive) {
         inactiveTiles.push(<Tile key={i}
@@ -173,7 +295,6 @@ class App extends Component {
                                tilt={0} />);
       }
     });
-
     var droppables = [];
     var i = 0;
     for (var y = 0; y < 15; y++) {
@@ -192,36 +313,37 @@ class App extends Component {
                                      styles={styles} />);
         i++;
       }
-
-      var words = this.props.words.map((word, index) => {
-        return (<li key={index}>{word}</li>);
-      });
     }
-
+    */
+    let tiles = this.state.tiles.map((obj, i) => {
+      return (<Tile key={i}
+                    onClick={() => {
+                      this.onTileClick(event, obj.id, obj.letter);
+                    }}
+                    {...obj} />);
+    });
+    console.log("rendering app");
     return (
       <div className="game">
         <div className="score-board">
-          <CountdownTimer initialTimeRemaining={this.props.time} />
-          <span className="active">Active tiles: {activeTiles.length}</span>
-          <span className="inactive">Inactive tiles: {inactiveTiles.length}</span>
+          <span className="active">Active tiles: {0}</span>
+          <span className="inactive">Inactive tiles: {0}</span>
           <div className="word-list">
             <ol>
-              {words}
             </ol>
           </div>
         </div>
         <div className="pile">
-          {inactiveTiles}
         </div>
         <div className="grid">
-          {droppables}
-          {activeTiles}
+          {tiles}
+          {this.cells}
         </div>
       </div>
     );
   }
 }
-
+/*
 
 const mapStateToProps = (state) => {
   return {
@@ -239,3 +361,4 @@ export default connect(mapStateToProps, {
   updateTestTile,
   updateWords
 })(App);
+*/

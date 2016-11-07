@@ -68,7 +68,7 @@ body {
 }
 
 .tile {
-  transition: all 0.3s ease-in-out;
+  transition: top 0.3s linear, left 0.3s linear;
   margin: 1px;
   border: 1px solid #f3dda1;
   position: absolute;
