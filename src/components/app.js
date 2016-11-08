@@ -25,6 +25,7 @@ const buildTestTiles = () => {
         letter: String.fromCharCode(97+x+y),
         x: x*40,
         y: y*40,
+        visited: false,
         isSelected: false
       });
       i++;
@@ -77,7 +78,7 @@ export default class App extends Component {
     }
     return cells;
   } 
-  /*
+  
   componentWillReceiveProps(nextProps) {
     if (nextProps.testTiles !== this.props.testTiles) {
       var startTiles = nextProps.tiles.filter(tile => {
@@ -88,9 +89,12 @@ export default class App extends Component {
       this.doWordCheck(nextProps.testTiles, startTiles);
     }
   }
-  */
+
   componentDidUpdate(prevProps, prevState) {
-    
+    this.doWordCheck(this.state.tiles,
+                     this.state.tiles.filter(t => {
+                       return t.x === 0 && t.y === 0
+                     }));
   }
 
   onTileDoubleClick(event, id, letter) {
@@ -278,9 +282,19 @@ export default class App extends Component {
       another above and to the left
       of it.
     */
+    let _testTiles = {}
+    testTiles.forEach(tile => {
+      _testTiles[`${tile.x},${tile.y}`] = {
+        x: tile.x,
+        y: tile.y,
+        visited: false
+      };
+    });
+    console.log(_testTiles);
+
     var words = '';
     startTiles.forEach(tile => {
-      var result = depthFirstSearch(tile.y, tile.x, testTiles);
+      var result = depthFirstSearch(tile.y, tile.x, _testTiles);
       words += ';' + result; 
     });
     console.log(words, words.split(';').filter(s => { return (s !== "") }));
