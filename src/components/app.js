@@ -67,6 +67,8 @@ export default class App extends Component {
         };  
         cells.push(<div key={i}
                         className={"empty-tile"}
+                        onMouseOver={(event) => {
+                        }}
                         style={styles}
                         onClick={this.onCellClick}
                    ></div>);
@@ -151,6 +153,7 @@ export default class App extends Component {
       });
     } else {
       let selectedTiles = this.state.tiles.filter(obj => obj.isSelected);
+      
       if (selectedTiles.length === 1) {
         // swap coordinates with other tile. 
         let temp = {
@@ -179,6 +182,14 @@ export default class App extends Component {
         
         this.setState({
           tiles: tilesCopy
+        });
+      } else {
+        this.setState({
+          tiles: [
+            ...this.state.tiles.slice(0, id),
+            tile,
+            ...this.state.tiles.slice(id + 1)
+          ]
         });
       }
 
