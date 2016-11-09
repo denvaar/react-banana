@@ -188,8 +188,6 @@ export default class App extends Component {
   }
 
   onCellClick(event, _x, _y) {
-    console.log(event.target.style.left, event.target.style.top);
-    
     var selectedTiles = this.state.tiles.filter(tile => tile.isSelected);
     
     if (selectedTiles.length === 1) {
@@ -229,7 +227,8 @@ export default class App extends Component {
         x: tile.x,
         y: tile.y,
         letter: tile.letter,
-        visited: false
+        visited: false,
+        canVisitAgain: false
       };
     });
     
@@ -240,21 +239,20 @@ export default class App extends Component {
           x: tile.x,
           y: tile.y,
           letter: tile.letter,
-          visited: false
+          visited: false,
+          canVisitAgain: false
         }
       }
     });
 
-    console.log("start tiles:", _startTiles);
 
     var words = '';
     Object.keys(_startTiles).forEach(tile => {
-      let x = tile.split(',')[0];
-      let y = tile.split(',')[1];
+      let x = parseInt(tile.split(',')[0]);
+      let y = parseInt(tile.split(',')[1]);
       var result = depthFirstSearch(x, y, _testTiles);
       words += ';' + result; 
     });
-    console.log(words);
     return words.split(';').filter(s => { return s !== "" });
   }
   

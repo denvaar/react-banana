@@ -58,6 +58,8 @@ var tileStack = [];
 
 
 const _getNextTileCoords = (x, y, z, testTiles) => {
+  x = parseInt(x);
+  y = parseInt(y);
   var canGoRight = (testTiles[`${x+40},${y}`] && !testTiles[`${x+40},${y}`].visited);
   var canGoDown = (testTiles[`${x},${y+40}`] && !testTiles[`${x},${y+40}`].visited);
   var canGoUp = (testTiles[`${x},${y-40}`] && !testTiles[`${x},${y-40}`].visited);
@@ -91,6 +93,8 @@ const _getNextTileCoords = (x, y, z, testTiles) => {
 }
 
 export const depthFirstSearch = (x, y, testTiles) => {
+  x = parseInt(x);
+  y = parseInt(y);
   tileStack.push(testTiles[`${x},${y}`]);
   testTiles[`${x},${y}`].visited = true;
   var words = testTiles[`${x},${y}`].letter;
