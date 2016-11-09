@@ -18,8 +18,8 @@ import Tile from './tile';
 const buildTestTiles = () => {
   let tiles = [];
   let i = 0;
-  for (var y = 0; y < 100; y++) {
-    for (var x = 0; x < 10; x++) {
+  for (var y = 5; y < 10; y++) {
+    for (var x = 5; x < 10; x++) {
       tiles.push({
         id: i,
         letter: String.fromCharCode(97+x+y),
@@ -37,14 +37,17 @@ const buildTestTiles = () => {
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      tiles: buildTestTiles(),
-    };
     
     this.onTileClick = this.onTileClick.bind(this);
     this.onTileDoubleClick = this.onTileDoubleClick.bind(this);
     this.onCellClick = this.onCellClick.bind(this);
     this.doWordCheck = this.doWordCheck.bind(this);
+    
+    let tiles = buildTestTiles();
+    this.state = {
+      tiles: tiles,
+      words: this.doWordCheck(tiles, tiles.filter(t => { return t.x === 0 && t.y === 0 }))
+    };
     
     this.cells = this.setupGrid();
     
@@ -79,24 +82,6 @@ export default class App extends Component {
     return cells;
   } 
   
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.testTiles !== this.props.testTiles) {
-      var startTiles = nextProps.tiles.filter(tile => {
-        return (tile.isActive &&
-                !nextProps.testTiles[`${tile.y-40},${tile.x}`] &&
-                !nextProps.testTiles[`${tile.y},${tile.x-40}`]);
-      });
-      this.doWordCheck(nextProps.testTiles, startTiles);
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    this.doWordCheck(this.state.tiles,
-                     this.state.tiles.filter(t => {
-                       return t.x === 0 && t.y === 0
-                     }));
-  }
-
   onTileDoubleClick(event, id, letter) {
     var index = this.props.tiles.findIndex(obj => obj.id === id);
     var tile = this.props.tiles.filter(obj => { return(obj.id === id) })[0];
@@ -171,12 +156,13 @@ export default class App extends Component {
           isSelected: false
         };
         tile = { ...tile, ...temp, isSelected: false};
-        console.log(selectedTiles[0].id, tile.id) 
+        
         let tilesCopy = [
           ...this.state.tiles.slice(0, tile.id),
           tile,
           ...this.state.tiles.slice(tile.id + 1)
         ];
+        
         tilesCopy = [
           ...tilesCopy.slice(0, selectedTiles[0].id),
           selectedTiles[0],
@@ -185,7 +171,8 @@ export default class App extends Component {
         
         
         this.setState({
-          tiles: tilesCopy
+          tiles: tilesCopy,
+          words: this.doWordCheck(tilesCopy, tilesCopy.filter(t => { return t.x === 0 && t.y === 0 }))
         });
       } else {
         this.setState({
@@ -198,39 +185,6 @@ export default class App extends Component {
       }
 
     }
-
-
-    /*
-    var index = this.props.tiles.findIndex(obj => obj.id === id);
-
-    var clickedTiles = this.props.tiles.filter(obj => obj.clicked === true);
-    if (clickedTiles.length > 0 && (id != clickedTiles[0].id)) {
-      
-      var oldX = clickedTiles[0].x;
-      var oldY = clickedTiles[0].y;
-
-      clickedTiles[0].clicked = false;
-
-      clickedTiles[0].x = clickedTiles[0].x + this.props.tiles[index].x;
-      this.props.tiles[index].x = clickedTiles[0].x - this.props.tiles[index].x;
-      clickedTiles[0].x = clickedTiles[0].x - this.props.tiles[index].x;
-      
-      clickedTiles[0].y = clickedTiles[0].y + this.props.tiles[index].y;
-      this.props.tiles[index].y = clickedTiles[0].y - this.props.tiles[index].y;
-      clickedTiles[0].y = clickedTiles[0].y - this.props.tiles[index].y;
-      
-      this.props.updateTestTile(`${clickedTiles[0].y},${clickedTiles[0].x}`,
-                                this.props.tiles[index].y, this.props.tiles[index].x);
-      this.props.updateTestTile(`${this.props.tiles[index].y},${this.props.tiles[index].x}`,
-                                oldY, oldX);
-    }
-    
-    this.props.updateTile(Object.assign(
-      this.props.tiles[index], {
-      id: id,
-      clicked: (clickedTiles.length > 0) ? false : true
-    }), index);
-    */
   }
 
   onCellClick(event, _x, _y) {
@@ -243,36 +197,22 @@ export default class App extends Component {
         x: event.target.style.left.split("px")[0],
         y: event.target.style.top.split("px")[0]
       };
+      let newTiles = [
+        ...this.state.tiles.slice(0, selectedTiles[0].id),
+        {
+          ...selectedTiles[0],
+          ...newCoords,
+          isSelected: false
+        },
+        ...this.state.tiles.slice(selectedTiles[0].id + 1)
+      ];
+      
+      
       this.setState({
-        tiles: [
-          ...this.state.tiles.slice(0, selectedTiles[0].id),
-          {
-            ...selectedTiles[0],
-            ...newCoords,
-            isSelected: false
-          },
-          ...this.state.tiles.slice(selectedTiles[0].id + 1)
-        ]
+        tiles: newTiles,
+        words: this.doWordCheck(newTiles, newTiles.filter(t => {return t.x === 0 && t.y === 0}))
       });
     }
-    /*
-    var tile = this.props.tiles.filter(obj => obj.clicked === true)[0];
-    if (tile) {
-      
-      this.props.testTiles[`${tile.y},${tile.x}`]
-      this.props.updateTestTile(`${tile.y},${tile.x}`, _x, _y);
-
-      var index = this.props.tiles.findIndex(obj => obj.id === tile.id);
-
-      this.props.updateTile(Object.assign(
-        this.props.tiles[index], {
-        x: _y,
-        y: _x,
-        clicked: false
-      }), index);
-      this.doWordCheck();
-    }
-    */
   }
 
   doWordCheck(testTiles, startTiles = []) {
@@ -282,64 +222,43 @@ export default class App extends Component {
       another above and to the left
       of it.
     */
-    let _testTiles = {}
+    let _testTiles = {};
+    let _startTiles = {};
     testTiles.forEach(tile => {
       _testTiles[`${tile.x},${tile.y}`] = {
         x: tile.x,
         y: tile.y,
+        letter: tile.letter,
         visited: false
       };
     });
-    console.log(_testTiles);
+    
+    
+    testTiles.forEach(tile => {
+      if (!_testTiles[`${tile.x-40},${tile.y}`] && !_testTiles[`${tile.x},${tile.y-40}`]) {
+        _startTiles[`${tile.x},${tile.y}`] = {
+          x: tile.x,
+          y: tile.y,
+          letter: tile.letter,
+          visited: false
+        }
+      }
+    });
+
+    console.log("start tiles:", _startTiles);
 
     var words = '';
-    startTiles.forEach(tile => {
-      var result = depthFirstSearch(tile.y, tile.x, _testTiles);
+    Object.keys(_startTiles).forEach(tile => {
+      let x = tile.split(',')[0];
+      let y = tile.split(',')[1];
+      var result = depthFirstSearch(x, y, _testTiles);
       words += ';' + result; 
     });
-    console.log(words, words.split(';').filter(s => { return (s !== "") }));
-
-    this.props.updateWords(words.split(';').filter(s => {
-      return s !== "";
-    }));
+    console.log(words);
+    return words.split(';').filter(s => { return s !== "" });
   }
   
   render() {
-    /* 
-    this.props.tiles.map((tile, i) => {
-      if (!tile.isActive) {
-        inactiveTiles.push(<Tile key={i}
-                                 onTileClick={this.onTileClick}
-                                 onTileDoubleClick={this.onTileDoubleClick}
-                                 {...tile} />);
-      } else {
-        activeTiles.push(<Tile key={i}
-                               {...tile}
-                               onTileClick={this.onTileClick}
-                               onTileDoubleClick={this.onTileDoubleClick}
-                               tilt={0} />);
-      }
-    });
-    var droppables = [];
-    var i = 0;
-    for (var y = 0; y < 15; y++) {
-      for (var x = 0; x < 20; x++) {
-        let styles = {
-          top: y * 40,
-          left: x * 40,
-          zIndex: 0
-        };
-        droppables.push(<BoardSquare key={i}
-                                     x={x*40} y={y*40}
-                                     onBoardSquareClick={this.onBoardSquareClick}
-                                     tiles={this.props.tiles}
-                                     updateTile={this.props.updateTile}
-                                     updateTestTile={this.props.updateTestTile}
-                                     styles={styles} />);
-        i++;
-      }
-    }
-    */
     let tiles = this.state.tiles.map((obj, i) => {
       return (<Tile key={i}
                     onClick={() => {
@@ -353,10 +272,14 @@ export default class App extends Component {
         <div className="score-board">
           <span className="active">Active tiles: {0}</span>
           <span className="inactive">Inactive tiles: {0}</span>
-          <div className="word-list">
+          
+          {this.state.words.length > 0 && <div className="word-list">
             <ol>
+            {this.state.words.map((word, i) => {
+              return <li key={i}>{word}</li>
+            })}
             </ol>
-          </div>
+          </div>}
         </div>
         <div className="pile">
         </div>
